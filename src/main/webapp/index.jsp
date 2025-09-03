@@ -5,7 +5,6 @@
     username = (String) session.getAttribute("username");
   }
 %>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +12,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Credit Card Validator</title>
   <style>
-    /* Background and general styles as in your original code */
+    /* Background and general styles */
     body {
       font-family: 'Roboto', Arial, sans-serif;
       background-image: url('images/background.jpg');
@@ -26,7 +25,8 @@
       justify-content: center;
       align-items: center;
     }
-    /* CARD CONTAINER - used for card validator and login container */
+    
+    /* Card container styles for both login and card validator */
     .card-container, .login-container {
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(18px) saturate(120%);
@@ -41,7 +41,8 @@
       box-sizing: border-box;
       color: black;
     }
-    /* Login form colors and layout */
+    
+    /* Login form heading style */
     .login-container h2 {
       font-size: 1.6rem;
       font-weight: 700;
@@ -49,6 +50,8 @@
       color: #B22222;
       text-shadow: 0 1px 2px rgba(200, 200, 255, 0.13);
     }
+    
+    /* Inputs styling */
     .login-container input[type="text"],
     .login-container input[type="password"],
     input[type="text"] {
@@ -66,18 +69,23 @@
       box-shadow: none;
       margin-bottom: 18px;
     }
+    
+    /* Input focus styling */
     input[type="text"]:focus,
     .login-container input[type="text"]:focus,
     .login-container input[type="password"]:focus {
       background: rgba(255, 255, 255, 1);
       color: #000000;
       opacity: 1; 
+      box-shadow: 0 0 12px 3px rgba(178, 34, 34, 0.75);
     }
+    
     input[type="text"]::placeholder,
     .login-container input::placeholder {
       color: #888888;
       opacity: 1;
     }
+    
     /* Card validator heading */
     h2 {
       font-size: 1.6rem;
@@ -86,10 +94,12 @@
       color: #B22222;
       text-shadow: 0 1px 2px rgba(200, 200, 255, 0.13);
     }
-    /* Card validator input wrapper and card type display */
+    
+    /* Card validator input wrapper and card type */
     .input-wrapper {
       position: relative;
       width: 100%;
+      margin-bottom: 18px;
     }
     #cardType {
       position: absolute;
@@ -103,6 +113,7 @@
       font-size: 0.95rem;
       font-family: Arial, sans-serif;
     }
+    
     /* Buttons styling */
     button.validate-btn, .login-container button {
       background: linear-gradient(90deg, #4f8cff 25%, #7d4fff 75%);
@@ -124,14 +135,17 @@
       position: relative;
       user-select: none;
     }
+    
     button.validate-btn:hover:not(:disabled),
     .login-container button:hover {
       background: linear-gradient(90deg, #3e7eed 25%, #6846d3 75%);
     }
+    
     button.validate-btn:disabled, .login-container button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
+    
     /* Spinner */
     .spinner {
       border: 3px solid rgba(255, 255, 255, 0.3);
@@ -147,6 +161,7 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    
     /* Message styles */
     .message {
       font-size: 15px;
@@ -156,12 +171,14 @@
       transition: color 0.3s, opacity 0.3s;
       opacity: 1;
     }
+    
     .valid {
       color: #28a745;
     }
     .invalid {
       color: #dc3545;
     }
+    
     /* Shake input animation */
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
@@ -171,6 +188,7 @@
     .shake {
       animation: shake 0.4s;
     }
+    
     /* Fade in animation */
     @keyframes fadeIn {
       from { opacity: 0; }
@@ -179,7 +197,8 @@
     .fade-in {
       animation: fadeIn 0.3s forwards;
     }
-    /* Responsive */
+    
+    /* Responsive styling */
     @media (max-width: 500px) {
       .card-container, .login-container {
         width: 96vw;
@@ -197,6 +216,7 @@
         font-size: 0.85rem;
       }
     }
+    
     /* Login error message */
     .error {
       background: #fad7d7a8;
@@ -213,21 +233,21 @@
 <%
   if (username == null) {
 %>
-  <div class="login-container">
+  <div class="login-container" role="main" aria-label="Login Form">
     <h2>Sign In to Validator</h2>
     <% if (request.getAttribute("errorMessage") != null) { %>
-      <div class="error"><%= request.getAttribute("errorMessage") %></div>
+      <div class="error" role="alert"><%= request.getAttribute("errorMessage") %></div>
     <% } %>
     <form action="LoginServlet" method="post" novalidate>
-      <input type="text" name="username" placeholder="Username" required autofocus />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Log In</button>
+      <input type="text" name="username" placeholder="Username" required autofocus aria-required="true" aria-label="Username" />
+      <input type="password" name="password" placeholder="Password" required aria-required="true" aria-label="Password" />
+      <button type="submit" aria-label="Log in to Validator">Log In</button>
     </form>
   </div>
 <%
   } else {
 %>
-  <div class="card-container">
+  <div class="card-container" role="main" aria-label="Credit Card Validator">
     <h2>Credit Card Validator</h2>
     <div class="input-wrapper">
       <input
@@ -238,11 +258,29 @@
         autocomplete="cc-number"
         aria-label="Credit card number"
       />
-      <div id="cardType">Unknown</div>
+      <div id="cardType" aria-live="polite" aria-atomic="true">Unknown</div>
     </div>
-    <button class="validate-btn" id="validateBtn" onclick="validateCard()">
+    <div class="input-wrapper">
+      <input
+        type="text"
+        id="expiryDate"
+        placeholder="Expiration Date (MM/YY)"
+        maxlength="5"
+        aria-label="Expiration date in MM/YY format"
+      />
+    </div>
+    <div class="input-wrapper">
+      <input
+        type="text"
+        id="cvv"
+        placeholder="CVV"
+        maxlength="4"
+        aria-label="Card CVV"
+      />
+    </div>
+    <button class="validate-btn" id="validateBtn" onclick="validateCard()" aria-label="Validate credit card">
       Validate
-      <span class="spinner" id="spinner" style="display:none;"></span>
+      <span class="spinner" id="spinner" style="display:none;" aria-hidden="true"></span>
     </button>
     <div id="resultMessage" class="message" role="alert" aria-live="polite"></div>
   </div>
@@ -288,6 +326,7 @@
     }
 
     cardInput.addEventListener('input', (e) => {
+      // Remove non-digits
       const number = e.target.value.replace(/\D/g, '');
       const detectedType = detectCardType(number);
       cardTypeDisplay.textContent = detectedType;
@@ -307,7 +346,7 @@
     function showMessage(message, isValid) {
       resultMessage.textContent = message;
       resultMessage.classList.remove('fade-in');
-      void resultMessage.offsetWidth; // trigger reflow to restart animation
+      void resultMessage.offsetWidth; // trigger reflow for animation
       resultMessage.classList.add('fade-in');
       if (isValid === true) {
         resultMessage.classList.add('valid');
@@ -324,6 +363,10 @@
 
     function validateCard() {
       const cardNumber = cardInput.value.replace(/\s/g, '');
+      const expiryDate = document.getElementById('expiryDate').value.trim();
+      const cvv = document.getElementById('cvv').value.trim();
+
+      // Basic validations
       if (cardNumber.length < 13 || cardNumber.length > 16) {
         showMessage('Card number must be between 13 and 16 digits.', false);
         return;
@@ -332,35 +375,49 @@
         showMessage('Invalid card number (failed Luhn check).', false);
         return;
       }
+      if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(expiryDate)) {
+        showMessage('Expiration date must be in MM/YY format.', false);
+        return;
+      }
+      if (!/^[0-9]{3,4}$/.test(cvv)) {
+        showMessage('CVV must be 3 or 4 digits.', false);
+        return;
+      }
+
       showMessage('Validating...', null);
       spinner.style.display = 'inline-block';
       validateBtn.disabled = true;
+      const body = 
+    	    'cardNumber=' + encodeURIComponent(cardNumber) + 
+    	    '&expiryDate=' + encodeURIComponent(expiryDate) + 
+    	    '&cvv=' + encodeURIComponent(cvv);
 
-      fetch('<%=request.getContextPath()%>/CardValidationServlet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'cardNumber=' + encodeURIComponent(cardNumber),
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
-      .then(data => {
-        if (data.valid) {
-          showMessage(data.message, true);
-        } else {
-          showMessage(data.message, false);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        showMessage('Server error. Please try again later.', false);
-      })
-      .finally(() => {
-        spinner.style.display = 'none';
-        validateBtn.disabled = false;
-      });
-    }
+     fetch('<%=request.getContextPath()%>/CardValidationServlet', {
+    	    method: 'POST',
+    	    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    	    body: body
+    	  })
+    	  .then(response => {
+    	    if (!response.ok) throw new Error('Network response was not ok');
+    	    return response.json();
+    	  })
+    	  .then(data => {
+    	    if (data.valid) {
+    	      showMessage(data.message, true);
+    	    } else {
+    	      showMessage(data.message, false);
+    	    }
+    	  })
+    	  .catch(error => {
+    	    console.error('Error:', error);
+    	    showMessage('Server error. Please try again later.', false);
+    	  })
+    	  .finally(() => {
+    	    spinner.style.display = 'none';
+    	    validateBtn.disabled = false;
+    	    
+    	  });
+     }
   </script>
 <% } // end logged-in else %>
 </body>
